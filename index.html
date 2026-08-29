@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AuditWise - Legal</title>
+    <style>
+        body {
+            background: #0a0a0a;
+            color: #e5e5e5;
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #fff;
+            font-size: 2rem;
+        }
+        h2 {
+            color: #fff;
+            margin-top: 1.5rem;
+        }
+        a {
+            color: #2563eb;
+        }
+        .nav {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        .nav a {
+            margin-right: 1rem;
+            color: #888;
+            text-decoration: none;
+        }
+        .nav a:hover {
+            color: #fff;
+        }
+        ul {
+            color: #ccc;
+            padding-left: 1.5rem;
+        }
+        li {
+            margin-bottom: 0.5rem;
+        }
+        .footer {
+            margin-top: 2rem;
+            color: #555;
+            font-size: 0.85rem;
+            border-top: 1px solid #1a1a1a;
+            padding-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="nav">
+        <a href="?page=pricing">Pricing</a>
+        <a href="?page=terms">Terms</a>
+        <a href="?page=privacy">Privacy</a>
+        <a href="?page=refund">Refund</a>
+    </div>
+
+    <div id="content">
+        <!-- Content loads here -->
+    </div>
+
+    <div class="footer">
+        AuditWise &copy; 2026 | <a href="mailto:ismailnabame@gmail.com">Contact</a>
+    </div>
+
+    <script>
+        const page = new URLSearchParams(window.location.search).get('page') || 'pricing';
+
+        const content = {
+            pricing: `
+                <h1>Pricing</h1>
+                <p><strong>$29 USD</strong> — one scan, one report.</p>
+                <p>Get a plain-English, severity-ranked security report for your smart contract in under 10 seconds.</p>
+                <p>First scan free with code: <strong>FIRSTFREE</strong></p>
+            `,
+            terms: `
+                <h1>Terms of Service</h1>
+                <p><strong>Last updated:</strong> August 29, 2026</p>
+
+                <h2>1. Service</h2>
+                <p>AuditWise provides AI-powered security report summaries for smart contract scan outputs. Reports are generated automatically and are not a substitute for a professional security audit.</p>
+
+                <h2>2. No Warranty</h2>
+                <p>The reports are provided "as is" without any warranties. We do not guarantee that the reports are error-free or that they will catch all vulnerabilities.</p>
+
+                <h2>3. Liability</h2>
+                <p>We are not liable for any damages arising from the use of our service. Users assume all risks associated with smart contract security.</p>
+
+                <h2>4. User Responsibility</h2>
+                <p>Users are responsible for verifying the accuracy of reports and for any decisions made based on them.</p>
+
+                <h2>5. Refund Policy</h2>
+                <p>Refunds are available within 7 days of purchase if the report is not delivered. See our Refund Policy for details.</p>
+
+                <h2>6. Contact</h2>
+                <p>Email: ismailnabame@gmail.com</p>
+            `,
+            privacy: `
+                <h1>Privacy Policy</h1>
+                <p><strong>Last updated:</strong> August 29, 2026</p>
+
+                <h2>Information We Collect</h2>
+                <p>We collect your email address and the scan output you submit. We do not store your code after the report is generated.</p>
+
+                <h2>How We Use Information</h2>
+                <p>We use your email to send you reports and updates. We use your scan output only to generate your report.</p>
+
+                <h2>Data Security</h2>
+                <p>All data is stored securely in Supabase. We do not share your data with third parties except to generate reports (via AI API).</p>
+
+                <h2>Your Rights</h2>
+                <p>You can request deletion of your data at any time by emailing ismailnabame@gmail.com.</p>
+
+                <h2>Contact</h2>
+                <p>Email: ismailnabame@gmail.com</p>
+            `,
+            refund: `
+                <h1>Refund Policy</h1>
+                <p><strong>Last updated:</strong> August 29, 2026</p>
+
+                <h2>7-Day Refund Guarantee</h2>
+                <p>We offer a full refund within 7 days of purchase if:</p>
+                <ul>
+                    <li>You did not receive your report</li>
+                    <li>The report is significantly incomplete or inaccurate</li>
+                    <li>You accidentally made a duplicate purchase</li>
+                </ul>
+
+                <h2>How to Request a Refund</h2>
+                <p>Email us at ismailnabame@gmail.com with your order number and reason for refund.</p>
+
+                <h2>Processing Time</h2>
+                <p>Refunds are processed within 5-10 business days.</p>
+            `
+        };
+
+        document.getElementById('content').innerHTML = content[page] || content.pricing;
+    </script>
+
+</body>
+</html>
