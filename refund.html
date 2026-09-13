@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refund Policy — AuditWise</title>
+    <meta name="description" content="AuditWise Refund Policy — when and how we issue refunds for scan purchases.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div data-nav></div>
+
+    <section class="hero">
+        <div class="container">
+            <span class="hero-eyebrow">Legal</span>
+            <h1>Refund Policy</h1>
+            <p class="hero-sub">
+                Last updated: <span id="last-updated"></span>
+            </p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container" style="max-width: 760px;">
+
+            <p class="mb-4 text-secondary">
+                We want you to be satisfied with every scan you purchase. This policy explains when we issue refunds
+                and how to request one.
+            </p>
+
+            <h2 class="mb-2 mt-4">1. Summary</h2>
+            <div class="card mb-4">
+                <p class="mb-3"><strong>We refund when:</strong></p>
+                <ul class="mb-3" style="padding-left: 20px; list-style: disc;">
+                    <li class="mb-2">Your scan failed to produce a report due to a technical error on our side.</li>
+                    <li class="mb-2">Your report was delivered but is materially incomplete or unreadable due to a bug.</li>
+                    <li class="mb-2">You were charged twice for the same scan.</li>
+                    <li class="mb-2">You requested a refund within 7 days and have not accessed the report.</li>
+                </ul>
+
+                <p class="mb-3"><strong>We do not refund when:</strong></p>
+                <ul style="padding-left: 20px; list-style: disc;">
+                    <li class="mb-2">You simply disagreed with the findings.</li>
+                    <li class="mb-2">The scan ran successfully but identified fewer issues than you expected.</li>
+                    <li class="mb-2">You submitted scan output that was malformed or unrelated to your code.</li>
+                    <li class="mb-2">You accessed the report and later changed your mind.</li>
+                </ul>
+            </div>
+
+            <h2 class="mb-2 mt-4">2. How to request a refund</h2>
+            <p class="mb-3">
+                Email us at <a href="mailto:support@auditwise.dev">support@auditwise.dev</a> with:
+            </p>
+            <ul class="mb-4" style="padding-left: 20px; list-style: disc;">
+                <li class="mb-2">The email address on your AuditWise account.</li>
+                <li class="mb-2">The Paddle transaction ID (found in your Paddle receipt email).</li>
+                <li class="mb-2">A short description of the issue.</li>
+            </ul>
+            <p class="mb-4">
+                We aim to respond to refund requests within 2 business days.
+            </p>
+
+            <h2 class="mb-2 mt-4">3. Timeframe</h2>
+            <p class="mb-4">
+                Refund requests must be made within <strong>7 days</strong> of purchase. After 7 days, refunds are
+                issued only at our discretion, and generally only in cases of verified technical failure.
+            </p>
+
+            <h2 class="mb-2 mt-4">4. How refunds are processed</h2>
+            <p class="mb-4">
+                Refunds are processed through Paddle, our merchant of record. Once approved, the refund is issued to
+                your original payment method. Depending on your bank or card issuer, it may take 5–10 business days
+                for the funds to appear.
+            </p>
+
+            <h2 class="mb-2 mt-4">5. Chargebacks</h2>
+            <p class="mb-4">
+                If you believe a charge was made in error, please contact us first at
+                <a href="mailto:support@auditwise.dev">support@auditwise.dev</a> before initiating a chargeback with
+                your bank. We resolve most issues quickly and directly. Accounts with unresolved chargebacks may be
+                suspended.
+            </p>
+
+            <h2 class="mb-2 mt-4">6. Free trial scans</h2>
+            <p class="mb-4">
+                AuditWise does not currently offer free trial scans. All scans are paid. If you're unsure whether
+                AuditWise fits your needs, contact us first — we're happy to answer questions before you purchase.
+            </p>
+
+            <h2 class="mb-2 mt-4">7. Statutory rights</h2>
+            <p class="mb-4">
+                Nothing in this policy limits any statutory rights you may have under the consumer protection laws
+                of your jurisdiction. Where local law provides stronger refund rights than this policy, local law
+                prevails.
+            </p>
+
+            <h2 class="mb-2 mt-4">8. Contact</h2>
+            <p class="mb-4">
+                For refund questions, contact us at
+                <a href="mailto:support@auditwise.dev">support@auditwise.dev</a> or through our
+                <a href="contact.html">contact page</a>.
+            </p>
+
+        </div>
+    </section>
+
+    <div data-footer></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="js/nav.js"></script>
+    <script>
+        document.getElementById('last-updated').textContent =
+            new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+    </script>
+</body>
+          </html>
