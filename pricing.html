@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing — AuditWise</title>
+    <meta name="description" content="Simple, transparent pricing. $29 per smart contract security report. No subscription, no hidden fees.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div data-nav></div>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="container">
+            <span class="hero-eyebrow">Pricing</span>
+            <h1>Simple pricing. No subscriptions.</h1>
+            <p class="hero-sub">
+                Pay only for the scans you run. One flat price, full report, no monthly commitment.
+            </p>
+        </div>
+    </section>
+
+    <!-- PRICING CARD -->
+    <section class="section">
+        <div class="container">
+            <div style="max-width: 480px; margin: 0 auto;">
+                <div class="card card-lg" style="border-color: var(--primary); border-width: 2px;">
+                    <div class="text-center">
+                        <span class="badge badge-low" style="margin-bottom: 16px;">Most popular</span>
+                        <h2 style="font-family: var(--font-heading); font-size: 1.5rem; margin-bottom: 8px;">
+                            Single security report
+                        </h2>
+                        <div style="display: flex; align-items: baseline; justify-content: center; gap: 8px; margin: 24px 0;">
+                            <span style="font-size: 3.5rem; font-weight: 700; letter-spacing: -0.03em; color: var(--text-primary);">$29</span>
+                            <span style="font-size: 1rem; color: var(--text-muted);">/ scan</span>
+                        </div>
+                        <p class="text-secondary" style="margin-bottom: 32px;">
+                            Everything you need to turn raw scanner output into a client-ready report.
+                        </p>
+                    </div>
+
+                    <ul style="margin-bottom: 32px;">
+                        <li style="padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 12px;">
+                            <span style="color: var(--low); flex-shrink: 0; font-weight: 700;">✓</span>
+                            <span>AI-powered analysis of Slither, Mythril, and Aderyn output</span>
+                        </li>
+                        <li style="padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 12px;">
+                            <span style="color: var(--low); flex-shrink: 0; font-weight: 700;">✓</span>
+                            <span>Findings ranked by severity with explanations and fixes</span>
+                        </li>
+                        <li style="padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 12px;">
+                            <span style="color: var(--low); flex-shrink: 0; font-weight: 700;">✓</span>
+                            <span>Security score (0–100) for quick triage</span>
+                        </li>
+                        <li style="padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 12px;">
+                            <span style="color: var(--low); flex-shrink: 0; font-weight: 700;">✓</span>
+                            <span>Email delivery of the report + permanent access in your dashboard</span>
+                        </li>
+                        <li style="padding: 12px 0; display: flex; align-items: flex-start; gap: 12px;">
+                            <span style="color: var(--low); flex-shrink: 0; font-weight: 700;">✓</span>
+                            <span>Supports scan output up to 150,000 characters</span>
+                        </li>
+                    </ul>
+
+                    <a href="index.html#submit" class="btn btn-primary btn-lg btn-block">
+                        Run a scan — $29
+                    </a>
+
+                    <p class="form-hint text-center" style="margin-top: 16px;">
+                        Secure checkout via Paddle. No subscription. No hidden fees.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section" style="border-top: 1px solid var(--border);">
+        <div class="container" style="max-width: 720px;">
+            <h2 class="text-center mb-4">Pricing questions</h2>
+
+            <div class="card mb-3">
+                <h4 style="margin-bottom: 8px;">Do I have to pay before I see if it works?</h4>
+                <p>You pay per scan. Each scan produces one full report. If the report doesn't parse correctly, you can request a refund — see our <a href="refund.html">refund policy</a>.</p>
+            </div>
+
+            <div class="card mb-3">
+                <h4 style="margin-bottom: 8px;">Is there a subscription?</h4>
+                <p>No. You pay $29 each time you run a scan. No monthly charge, no auto-renewal.</p>
+            </div>
+
+            <div class="card mb-3">
+                <h4 style="margin-bottom: 8px;">Can I use this for client work?</h4>
+                <p>Yes. The reports are yours to use in client deliverables, internal reviews, or public disclosures.</p>
+            </div>
+
+            <div class="card mb-3">
+                <h4 style="margin-bottom: 8px;">What if my scan is larger than 150,000 characters?</h4>
+                <p>Trim your scan to just the findings section (usually the top of the output) before submitting. Most standard scans fit well within the limit.</p>
+            </div>
+
+            <div class="card">
+                <h4 style="margin-bottom: 8px;">Do you offer volume discounts?</h4>
+                <p>For teams running 20+ scans per month, <a href="contact.html">get in touch</a> — we can discuss a custom arrangement.</p>
+            </div>
+        </div>
+    </section>
+
+    <div data-footer></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="js/nav.js"></script>
+</body>
+                          </html>
