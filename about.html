@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About — AuditWise</title>
+    <meta name="description" content="Why AuditWise exists: making smart contract security reports accessible to every developer and auditor.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div data-nav></div>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="container">
+            <span class="hero-eyebrow">About</span>
+            <h1>Making smart contract security accessible to everyone.</h1>
+            <p class="hero-sub">
+                AuditWise exists because great security tools shouldn't require a full-time security team to interpret.
+            </p>
+        </div>
+    </section>
+
+    <!-- THE PROBLEM -->
+    <section class="section">
+        <div class="container" style="max-width: 780px;">
+            <h2 class="mb-3">The problem</h2>
+            <p class="mb-3">
+                Static analysis tools like Slither, Mythril, and Aderyn are incredibly powerful. They scan your code
+                and produce detailed output covering every potential vulnerability — from reentrancy to integer
+                overflows, from access control issues to gas optimizations.
+            </p>
+            <p class="mb-3">
+                But that output is dense. It's written for machines, not humans. A single scan can produce dozens
+                of findings with cryptic rule IDs, code references, and severity flags that require a security
+                expert to interpret.
+            </p>
+            <p>
+                For solo developers, small teams, and auditors without a full-time security department, this creates
+                a painful gap: you know there are issues, but you don't have the time or expertise to triage them
+                properly.
+            </p>
+        </div>
+    </section>
+
+    <!-- THE SOLUTION -->
+    <section class="section" style="background-color: var(--bg-card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+        <div class="container" style="max-width: 780px;">
+            <h2 class="mb-3">Our approach</h2>
+            <p class="mb-3">
+                AuditWise takes the raw output from your existing scanners and turns it into a report a human
+                can actually act on.
+            </p>
+            <p class="mb-3">
+                We don't replace your tools. We don't run our own scans. We simply translate — taking the deterministic
+                findings your tools already produce and adding the layer of interpretation that makes them useful.
+            </p>
+            <p>
+                Every finding gets a plain-English explanation, a clear "why this matters" section, and a recommended
+                fix. Everything is ranked by severity so you know exactly what to look at first.
+            </p>
+        </div>
+    </section>
+
+    <!-- HOW IT'S BUILT -->
+    <section class="section">
+        <div class="container" style="max-width: 780px;">
+            <h2 class="mb-3">How it's built</h2>
+            <p class="mb-4">
+                AuditWise is built on a small, focused stack chosen for reliability and transparency:
+            </p>
+
+            <div class="card mb-3">
+                <h4 style="margin-bottom: 6px;">Supabase</h4>
+                <p style="font-size: 0.9rem;">For authentication, database, and backend edge functions. Handles everything from user accounts to report storage.</p>
+            </div>
+
+            <div class="card mb-3">
+                <h4 style="margin-bottom: 6px;">Groq</h4>
+                <p style="font-size: 0.9rem;">For fast LLM inference. Powers the interpretation layer that turns raw tool output into human-readable findings.</p>
+            </div>
+
+            <div class="card mb-3">
+                <h4 style="margin-bottom: 6px;">Paddle</h4>
+                <p style="font-size: 0.9rem;">For payments. Handles checkout, tax, and compliance so we can focus on the product.</p>
+            </div>
+
+            <div class="card mb-3">
+                <h4 style="margin-bottom: 6px;">Resend</h4>
+                <p style="font-size: 0.9rem;">For email delivery. Sends you a link to your report the moment it's generated.</p>
+            </div>
+
+            <div class="card">
+                <h4 style="margin-bottom: 6px;">Netlify</h4>
+                <p style="font-size: 0.9rem;">For hosting the frontend. Fast, global, and simple to deploy.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRINCIPLES -->
+    <section class="section" style="background-color: var(--bg-card); border-top: 1px solid var(--border);">
+        <div class="container" style="max-width: 780px;">
+            <h2 class="mb-4">What we believe</h2>
+
+            <div class="mb-4">
+                <h4 style="margin-bottom: 6px;">Deterministic first, AI second.</h4>
+                <p>The findings come from your tools. The AI only interprets them. This means no hallucinated vulnerabilities.</p>
+            </div>
+
+            <div class="mb-4">
+                <h4 style="margin-bottom: 6px;">Transparency over magic.</h4>
+                <p>The raw scan output is always available in your report. You can always verify what we built on top of.</p>
+            </div>
+
+            <div class="mb-4">
+                <h4 style="margin-bottom: 6px;">Not a replacement for real audits.</h4>
+                <p>AuditWise is a triage tool. It helps you prioritize. It does not replace a professional security audit — especially before deploying high-value contracts.</p>
+            </div>
+
+            <div>
+                <h4 style="margin-bottom: 6px;">Simple pricing.</h4>
+                <p>One price, one scan, one report. No subscriptions, no lock-in, no hidden fees.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT CTA -->
+    <section class="section">
+        <div class="container text-center" style="max-width: 640px;">
+            <h2 class="mb-3">Have questions?</h2>
+            <p class="mb-4">We're happy to talk about how AuditWise fits into your workflow.</p>
+            <a href="contact.html" class="btn btn-primary btn-lg">Get in touch</a>
+        </div>
+    </section>
+
+    <div data-footer></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="js/nav.js"></script>
+</body>
+</html>
