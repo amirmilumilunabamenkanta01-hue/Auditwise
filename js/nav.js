@@ -1,8 +1,7 @@
 // ============================================================
 // js/nav.js
-// Injects the shared navigation + footer into every page.
-// Usage: Add <div data-nav></div> at top and <div data-footer></div>
-// at bottom of any HTML page, then import this file.
+// Injects shared nav, footer, scroll progress, toasts, and
+// floating CTA into every page.
 // ============================================================
 
 import { supabase } from './config.js';
@@ -75,11 +74,91 @@ const FOOTER_HTML = `
 </footer>
 `;
 
+// ---- Toast notification system ----
+let toastContainer = null;
+
+function ensureToastContainer() {
+    if (toastContainer) return toastContainer;
+    toastContainer = document.createElement('div');
+    toastContainer.className = 'toast-container';
+    document.body.appendChild(toastContainer);
+    return toastContainer;
+}
+
+/**
+ * Global toast helper. Usage:
+ *   showToast('Profile saved', 'success');
+ *   showToast('Something went wrong', 'error');
+ *   showToast('Copied to clipboard');
+ */
+window.showToast = function (message, type = 'info', duration = 3000) {
+    const container = ensureToastContainer();
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+
+    const icon = type === 'success' ? '✓'
+              : type === 'error' ? '✕'
+              : 'ℹ';
+
+    toast.innerHTML = `<span style="font-weight: 600;">${icon}</span><span>${message}</span>`;
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.classList.add('leaving');
+        setTimeout(() => toast.remove(), 300);
+    }, duration);
+};
+
+// ---- Scroll progress bar ----
+function injectScrollProgress() {
+    const bar = document.createElement('div');
+    bar.className = 'scroll-progress';
+    document.body.appendChild(bar);
+
+    window.addEventListener('scroll', () => {
+        const h = document.documentElement;
+        const scrollTop = h.scrollTop || document.body.scrollTop;
+        const scrollHeight = h.scrollHeight - h.clientHeight;
+        const percent = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+        bar.style.width = percent + '%';
+    }, { passive: true });
+}
+
+// ---- Floating CTA (homepage only, appears after scroll) ----
+function injectFloatingCTA() {
+    // Only on index.html
+    const isHomepage = /\/(index\.html)?$/.test(window.location.pathname) ||
+                       window.location.pathname.endsWith('/Auditwise/') ||
+                       window.location.pathname.endsWith('/Auditwise');
+    if (!isHomepage) return;
+
+    const cta = document.createElement('a');
+    cta.href = '#submit';
+    cta.className = 'floating-cta';
+    cta.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+        Start a scan
+    `;
+    document.body.appendChild(cta);
+
+    window.addEventListener('scroll', () => {
+        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        if (scrollTop > 600) {
+            cta.classList.add('visible');
+        } else {
+            cta.classList.remove('visible');
+        }
+    }, { passive: true });
+}
+
+// ---- Nav ----
 async function renderNav() {
     const navMount = document.querySelector('[data-nav]');
     if (navMount) navMount.innerHTML = NAV_HTML;
 
-    // Update nav actions based on auth state
     try {
         const { data: { session } } = await supabase.auth.getSession();
         const actionsEl = document.getElementById('nav-actions');
@@ -100,12 +179,13 @@ async function renderNav() {
     }
 }
 
+// ---- Footer ----
 function renderFooter() {
     const footerMount = document.querySelector('[data-footer]');
     if (footerMount) footerMount.innerHTML = FOOTER_HTML;
 }
 
-// Reveal-on-scroll observer
+// ---- Reveal on scroll ----
 function setupReveal() {
     const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
@@ -119,6 +199,25 @@ function setupReveal() {
     document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
 }
 
+// ---- Favicon + meta (auto-inject if missing) ----
+function ensureFavicon() {
+    if (document.querySelector('link[rel="icon"]')) return;
+    const link = document.createElement('link');
+    link.rel = 'icon';
+    link.type = 'image/svg+xml';
+    link.href = 'favicon.svg';
+    document.head.appendChild(link);
+
+    const theme = document.createElement('meta');
+    theme.name = 'theme-color';
+    theme.content = '#09090b';
+    document.head.appendChild(theme);
+}
+
+// ---- Run everything ----
 renderNav();
 renderFooter();
 setupReveal();
+injectScrollProgress();
+injectFloatingCTA();
+ensureFavicon();
