@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — AuditWise</title>
+    <meta name="description" content="AuditWise admin panel.">
+    <meta name="robots" content="noindex, nofollow">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Login state -->
+    <div id="login-view" class="auth-wrapper">
+        <div class="auth-card">
+            <h1>Admin access</h1>
+            <p class="auth-sub">Enter your admin password to continue.</p>
+
+            <form id="admin-login-form">
+                <div class="form-group">
+                    <label class="form-label" for="admin-password">Admin password</label>
+                    <input type="password" class="form-input" id="admin-password" autocomplete="current-password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block btn-lg" id="admin-login-btn">
+                    Sign in
+                </button>
+                <p id="admin-login-error" class="form-error hidden"></p>
+            </form>
+
+            <p class="auth-footer">
+                <a href="index.html">← Back to site</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Dashboard state -->
+    <div id="admin-view" class="hidden">
+        <div data-nav></div>
+
+        <main class="section">
+            <div class="container">
+
+                <div class="flex-between mb-4" style="flex-wrap: wrap; gap: 16px;">
+                    <div>
+                        <h1>Admin panel</h1>
+                        <p class="text-secondary mt-1">Overview of all scans and users.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="btn btn-secondary" id="export-btn">Export CSV</button>
+                        <button class="btn btn-ghost" id="admin-logout">Log out</button>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-grid mb-4">
+                    <div class="stat-card">
+                        <div class="stat-label">Total users</div>
+                        <div class="stat-value" id="admin-users">—</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total scans</div>
+                        <div class="stat-value" id="admin-scans">—</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Revenue</div>
+                        <div class="stat-value" style="color: var(--low);" id="admin-revenue">—</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Avg score</div>
+                        <div class="stat-value" id="admin-avg-score">—</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Critical</div>
+                        <div class="stat-value" style="color: var(--critical);" id="admin-critical">—</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Pending scans</div>
+                        <div class="stat-value" id="admin-pending">—</div>
+                    </div>
+                </div>
+
+                <!-- Scan list -->
+                <h2 class="mb-3">All scans</h2>
+                <div class="table-wrapper mb-3">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Contract type</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-table">
+                            <tr><td colspan="5" class="text-center text-muted" style="padding: 32px;">Loading…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="flex-between">
+                    <button class="btn btn-secondary" id="prev-btn" disabled>← Previous</button>
+                    <span class="text-muted" id="page-info" style="font-size: 0.875rem;"></span>
+                    <button class="btn btn-secondary" id="next-btn" disabled>Next →</button>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module">
+        import { API_URL } from './js/config.js';
+
+        const TOKEN_KEY = 'auditwise_admin_token';
+        let adminToken = localStorage.getItem(TOKEN_KEY) || null;
+        let currentPage = 1;
+        let totalPages = 1;
+
+        const loginView = document.getElementById('login-view');
+        const adminView = document.getElementById('admin-view');
+
+        function adminHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${adminToken}`
+            };
+        }
+
+        function showLogin() {
+            loginView.classList.remove('hidden');
+            adminView.classList.add('hidden');
+        }
+
+        function showAdmin() {
+            loginView.classList.add('hidden');
+            adminView.classList.remove('hidden');
+        }
+
+        function logout() {
+            adminToken = null;
+            localStorage.removeItem(TOKEN_KEY);
+            window.location.reload();
+        }
+
+        // ---- Login ----
+        document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('admin-login-btn');
+            const errEl = document.getElementById('admin-login-error');
+            const password = document.getElementById('admin-password').value;
+
+            errEl.classList.add('hidden');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Signing in…';
+
+            try {
+                const res = await fetch(`${API_URL}/admin/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Login failed');
+
+                adminToken = data.token;
+                localStorage.setItem(TOKEN_KEY, adminToken);
+                showAdmin();
+                loadAll();
+            } catch (err) {
+                errEl.textContent = err.message;
+                errEl.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Sign in';
+            }
+        });
+
+        document.getElementById('admin-logout').addEventListener('click', logout);
+
+        // ---- Load stats ----
+        async function loadStats() {
+            try {
+                const res = await fetch(`${API_URL}/admin/stats`, { headers: adminHeaders() });
+                if (res.status === 401) return logout();
+                if (!res.ok) throw new Error('Failed to load stats');
+                const s = await res.json();
+
+                document.getElementById('admin-users').textContent = s.totalUsers ?? 0;
+                document.getElementById('admin-scans').textContent = s.totalScans ?? 0;
+                document.getElementById('admin-revenue').textContent = '$' + (s.revenue ?? 0);
+                document.getElementById('admin-avg-score').textContent = s.avgScore ?? '—';
+                document.getElementById('admin-critical').textContent = s.critical ?? 0;
+                document.getElementById('admin-pending').textContent = s.pendingScans ?? 0;
+            } catch (err) {
+                console.error('Stats error:', err);
+            }
+        }
+
+        // ---- Load scans (paginated) ----
+        async function loadScans(page = 1) {
+            const tbody = document.getElementById('admin-table');
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted" style="padding: 32px;">Loading…</td></tr>';
+
+            try {
+                const res = await fetch(`${API_URL}/admin/scans?page=${page}`, { headers: adminHeaders() });
+                if (res.status === 401) return logout();
+                if (!res.ok) throw new Error('Failed to load scans');
+                const data = await res.json();
+
+                currentPage = data.page || 1;
+                totalPages = Math.max(1, Math.ceil((data.total || 0) / (data.pageSize || 50)));
+
+                if (!data.reports || data.reports.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted" style="padding: 32px;">No scans yet.</td></tr>';
+                } else {
+                    tbody.innerHTML = data.reports.map(r => `
+                        <tr>
+                            <td>${escapeHtml(r.email || '—')}</td>
+                            <td>${escapeHtml(r.contract_type || '—')}</td>
+                            <td>
+                                <span class="badge ${r.paid ? 'badge-low' : 'badge-neutral'}">
+                                    ${r.paid ? 'Paid' : 'Pending'}
+                                </span>
+                            </td>
+                            <td>${new Date(r.created_at).toLocaleDateString()}</td>
+                            <td style="text-align: right;">
+                                <a href="report.html?id=${encodeURIComponent(r.id)}" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;">View</a>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+
+                document.getElementById('page-info').textContent = `Page ${currentPage} of ${totalPages}`;
+                document.getElementById('prev-btn').disabled = currentPage <= 1;
+                document.getElementById('next-btn').disabled = currentPage >= totalPages;
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="padding: 32px; color: var(--critical);">Failed to load scans.</td></tr>`;
+                console.error('Scans error:', err);
+            }
+        }
+
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // ---- Pagination ----
+        document.getElementById('prev-btn').addEventListener('click', () => {
+            if (currentPage > 1) loadScans(currentPage - 1);
+        });
+        document.getElementById('next-btn').addEventListener('click', () => {
+            if (currentPage < totalPages) loadScans(currentPage + 1);
+        });
+
+        // ---- CSV Export ----
+        document.getElementById('export-btn').addEventListener('click', async () => {
+            const btn = document.getElementById('export-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Exporting…';
+            try {
+                const res = await fetch(`${API_URL}/admin/export-csv`, { headers: adminHeaders() });
+                if (res.status === 401) return logout();
+                if (!res.ok) throw new Error('Export failed');
+
+                const blob = await res.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `auditwise-scans-${new Date().toISOString().slice(0, 10)}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            } catch (err) {
+                alert(err.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Export CSV';
+            }
+        });
+
+        // ---- Boot ----
+        function loadAll() {
+            loadStats();
+            loadScans(1);
+        }
+
+        if (adminToken) {
+            showAdmin();
+            loadAll();
+        } else {
+            showLogin();
+        }
+    </script>
+</body>
+  </html>
