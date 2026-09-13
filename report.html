@@ -8,7 +8,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -16,11 +16,11 @@
     <div data-nav></div>
 
     <main class="section">
-        <div class="container" style="max-width: 900px;">
+        <div class="container" style="max-width: 940px;">
 
             <!-- Loading state -->
             <div id="loading" class="card card-lg text-center">
-                <div class="spinner" style="border-color: rgba(79,70,229,0.3); border-top-color: var(--primary); width: 24px; height: 24px;"></div>
+                <div class="spinner" style="border-color: rgba(16, 185, 129, 0.25); border-top-color: var(--brand); width: 24px; height: 24px;"></div>
                 <p class="text-secondary mt-3">Loading your report…</p>
             </div>
 
@@ -45,7 +45,7 @@
                     <div class="flex-between mb-3" style="flex-wrap: wrap; gap: 16px;">
                         <div>
                             <div class="stat-label">Security score</div>
-                            <div class="stat-value" id="report-score" style="font-size: 2.5rem;">—</div>
+                            <div class="stat-value" id="report-score" style="font-size: 2.75rem; color: var(--brand);">—</div>
                         </div>
                         <div class="text-center">
                             <div class="stat-label">Critical</div>
