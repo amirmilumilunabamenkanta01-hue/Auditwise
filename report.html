@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Report — AuditWise</title>
+    <meta name="description" content="View your AuditWise security report.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div data-nav></div>
+
+    <main class="section">
+        <div class="container" style="max-width: 900px;">
+
+            <!-- Loading state -->
+            <div id="loading" class="card card-lg text-center">
+                <div class="spinner" style="border-color: rgba(79,70,229,0.3); border-top-color: var(--primary); width: 24px; height: 24px;"></div>
+                <p class="text-secondary mt-3">Loading your report…</p>
+            </div>
+
+            <!-- Error state -->
+            <div id="error-state" class="alert alert-danger hidden">
+                <strong>Could not load report.</strong>
+                <p id="error-message" class="mt-1"></p>
+                <a href="dashboard.html" class="btn btn-secondary mt-3">Back to dashboard</a>
+            </div>
+
+            <!-- Report content -->
+            <div id="report-container" class="hidden">
+
+                <div class="mb-4">
+                    <a href="dashboard.html" style="font-size: 0.875rem;">← Back to dashboard</a>
+                    <h1 class="mt-2">Security report</h1>
+                    <p class="text-secondary mt-1" id="report-meta">—</p>
+                </div>
+
+                <!-- Summary card -->
+                <div class="card card-lg mb-4">
+                    <div class="flex-between mb-3" style="flex-wrap: wrap; gap: 16px;">
+                        <div>
+                            <div class="stat-label">Security score</div>
+                            <div class="stat-value" id="report-score" style="font-size: 2.5rem;">—</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="stat-label">Critical</div>
+                            <div class="stat-value" style="color: var(--critical);" id="count-critical">0</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="stat-label">High</div>
+                            <div class="stat-value" style="color: var(--high);" id="count-high">0</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="stat-label">Medium</div>
+                            <div class="stat-value" style="color: var(--medium);" id="count-medium">0</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="stat-label">Low</div>
+                            <div class="stat-value" style="color: var(--low);" id="count-low">0</div>
+                        </div>
+                    </div>
+                    <div style="border-top: 1px solid var(--border); padding-top: 20px;">
+                        <div class="finding-section-label">Summary</div>
+                        <p id="report-summary">—</p>
+                    </div>
+                </div>
+
+                <!-- Top priority findings -->
+                <h2 class="mb-3">Top priority findings</h2>
+                <div id="top-findings" class="mb-4"></div>
+
+                <!-- All findings -->
+                <h2 class="mb-3">All findings</h2>
+                <div id="all-findings"></div>
+
+                <!-- Raw output (collapsed) -->
+                <div class="card mt-4">
+                    <details>
+                        <summary style="cursor: pointer; font-weight: 500; color: var(--text-primary);">
+                            Raw scan output
+                        </summary>
+                        <div class="code-block mt-3" id="raw-output" style="max-height: 400px; overflow-y: auto;"></div>
+                    </details>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <div data-footer></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="js/nav.js"></script>
+    <script type="module">
+        import { API_URL, supabase, getAuthHeaders } from './js/config.js';
+
+        const params = new URLSearchParams(window.location.search);
+        const reportId = params.get('id');
+
+        const loadingEl = document.getElementById('loading');
+        const errorEl = document.getElementById('error-state');
+        const containerEl = document.getElementById('report-container');
+
+        function showError(msg) {
+            loadingEl.classList.add('hidden');
+            containerEl.classList.add('hidden');
+            document.getElementById('error-message').textContent = msg;
+            errorEl.classList.remove('hidden');
+        }
+
+        // Escape user-supplied strings before injecting into HTML
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function renderFinding(f) {
+            const severity = (f.severity || 'low').toLowerCase();
+            const badgeClass = `badge-${severity}`;
+            return `
+                <div class="finding ${severity}">
+                    <div class="finding-header">
+                        <div class="finding-title">${escapeHtml(f.title || 'Untitled finding')}</div>
+                        <span class="badge ${badgeClass}">${escapeHtml(severity)}</span>
+                    </div>
+
+                    ${f.explanation ? `
+                        <div class="finding-section">
+                            <div class="finding-section-label">Explanation</div>
+                            <p>${escapeHtml(f.explanation)}</p>
+                        </div>
+                    ` : ''}
+
+                    ${f.why_it_matters ? `
+                        <div class="finding-section">
+                            <div class="finding-section-label">Why it matters</div>
+                            <p>${escapeHtml(f.why_it_matters)}</p>
+                        </div>
+                    ` : ''}
+
+                    ${f.code_snippet ? `
+                        <div class="finding-section">
+                            <div class="finding-section-label">Code</div>
+                            <div class="code-block">${escapeHtml(f.code_snippet)}</div>
+                        </div>
+                    ` : ''}
+
+                    ${f.fix ? `
+                        <div class="finding-section">
+                            <div class="finding-section-label">Recommended fix</div>
+                            <p>${escapeHtml(f.fix)}</p>
+                        </div>
+                    ` : ''}
+
+                    ${f.fix_code ? `
+                        <div class="finding-section">
+                            <div class="finding-section-label">Fixed code</div>
+                            <div class="code-block">${escapeHtml(f.fix_code)}</div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderReport(report) {
+            document.getElementById('report-score').textContent = report.summary_score ?? '—';
+            document.getElementById('count-critical').textContent = (report.critical || []).length;
+            document.getElementById('count-high').textContent     = (report.high || []).length;
+            document.getElementById('count-medium').textContent   = (report.medium || []).length;
+            document.getElementById('count-low').textContent      = (report.low || []).length;
+            document.getElementById('report-summary').textContent = report.summary || 'No summary available.';
+
+            const meta = [];
+            if (report.contract_type) meta.push(report.contract_type);
+            if (report.created_at)    meta.push(new Date(report.created_at).toLocaleDateString());
+            document.getElementById('report-meta').textContent = meta.join(' · ');
+
+            const topEl = document.getElementById('top-findings');
+            if (report.top_5 && report.top_5.length) {
+                topEl.innerHTML = report.top_5.map(renderFinding).join('');
+            } else {
+                topEl.innerHTML = '<p class="text-muted">No priority findings were identified.</p>';
+            }
+
+            const allEl = document.getElementById('all-findings');
+            const allFindings = [
+                ...(report.critical || []),
+                ...(report.high || []),
+                ...(report.medium || []),
+                ...(report.low || [])
+            ];
+            allEl.innerHTML = allFindings.length
+                ? allFindings.map(renderFinding).join('')
+                : '<p class="text-muted">No additional findings.</p>';
+
+            const raw = report.raw_output || '';
+            document.getElementById('raw-output').textContent = raw || 'No raw output stored.';
+
+            loadingEl.classList.add('hidden');
+            containerEl.classList.remove('hidden');
+        }
+
+        async function loadReport() {
+            if (!reportId) return showError('No report ID was provided.');
+
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                window.location.href = `login.html?redirect=report.html%3Fid%3D${encodeURIComponent(reportId)}`;
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/get-report?id=${encodeURIComponent(reportId)}`, {
+                    headers: await getAuthHeaders()
+                });
+                const data = await res.json();
+
+                if (!res.ok) throw new Error(data.error || 'Failed to load report.');
+                if (!data.report) throw new Error('Report data missing.');
+
+                renderReport(data.report);
+            } catch (err) {
+                showError(err.message || 'Something went wrong.');
+            }
+        }
+
+        loadReport();
+    </script>
+</body>
+</html>
