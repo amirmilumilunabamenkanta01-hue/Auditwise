@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log in — AuditWise</title>
+    <meta name="description" content="Log in or create an AuditWise account to submit smart contract scans.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Simple header with just the logo (no nav links) -->
+    <nav class="nav">
+        <div class="container nav-inner">
+            <a href="index.html" class="nav-logo">
+                <span class="nav-logo-mark">AW</span>
+                <span>AuditWise</span>
+            </a>
+        </div>
+    </nav>
+
+    <main class="auth-wrapper">
+        <div class="auth-card">
+            <h1 id="auth-title">Welcome back</h1>
+            <p class="auth-sub" id="auth-subtitle">Log in to your AuditWise account.</p>
+
+            <form id="auth-form">
+                <div class="form-group">
+                    <label class="form-label" for="email">Email address</label>
+                    <input
+                        type="email"
+                        class="form-input"
+                        id="email"
+                        autocomplete="email"
+                        placeholder="you@company.com"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <input
+                        type="password"
+                        class="form-input"
+                        id="password"
+                        autocomplete="current-password"
+                        placeholder="At least 6 characters"
+                        minlength="6"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-lg" id="auth-btn">
+                    Log in
+                </button>
+
+                <p id="auth-error" class="form-error hidden"></p>
+                <p id="auth-success" class="form-success hidden"></p>
+            </form>
+
+            <p class="auth-footer">
+                <span id="toggle-prompt">Don't have an account?</span>
+                <a href="#" id="toggle-link">Create one</a>
+            </p>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module">
+        import { supabase } from './js/config.js';
+
+        let isSignup = false;
+        const titleEl = document.getElementById('auth-title');
+        const subtitleEl = document.getElementById('auth-subtitle');
+        const btn = document.getElementById('auth-btn');
+        const form = document.getElementById('auth-form');
+        const errorEl = document.getElementById('auth-error');
+        const successEl = document.getElementById('auth-success');
+        const togglePrompt = document.getElementById('toggle-prompt');
+        const toggleLink = document.getElementById('toggle-link');
+
+        // If a redirect target was passed in the URL, keep it
+        const params = new URLSearchParams(window.location.search);
+        const redirectTo = params.get('redirect') || 'dashboard.html';
+
+        // If already logged in, go straight to dashboard
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+            window.location.href = redirectTo;
+        }
+
+        function showError(msg) {
+            errorEl.textContent = msg;
+            errorEl.classList.remove('hidden');
+            successEl.classList.add('hidden');
+        }
+
+        function showSuccess(msg) {
+            successEl.textContent = msg;
+            successEl.classList.remove('hidden');
+            errorEl.classList.add('hidden');
+        }
+
+        toggleLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            isSignup = !isSignup;
+
+            titleEl.textContent = isSignup ? 'Create your account' : 'Welcome back';
+            subtitleEl.textContent = isSignup
+                ? 'Start generating security reports in minutes.'
+                : 'Log in to your AuditWise account.';
+            btn.textContent = isSignup ? 'Create account' : 'Log in';
+            togglePrompt.textContent = isSignup ? 'Already have an account?' : "Don't have an account?";
+            toggleLink.textContent = isSignup ? 'Log in' : 'Create one';
+
+            document.getElementById('password').setAttribute(
+                'autocomplete',
+                isSignup ? 'new-password' : 'current-password'
+            );
+
+            errorEl.classList.add('hidden');
+            successEl.classList.add('hidden');
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            errorEl.classList.add('hidden');
+            successEl.classList.add('hidden');
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!email || !password) return showError('Please fill in all fields.');
+            if (password.length < 6) return showError('Password must be at least 6 characters.');
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> ' + (isSignup ? 'Creating…' : 'Logging in…');
+
+            try {
+                if (isSignup) {
+                    const { data, error } = await supabase.auth.signUp({ email, password });
+                    if (error) throw error;
+
+                    // If email confirmation is enabled in Supabase, no session yet
+                    if (data.user && !data.session) {
+                        showSuccess('Account created. Check your inbox to confirm your email.');
+                        btn.disabled = false;
+                        btn.textContent = 'Create account';
+                        return;
+                    }
+                } else {
+                    const { error } = await supabase.auth.signInWithPassword({ email, password });
+                    if (error) throw error;
+                }
+
+                // Success — redirect
+                window.location.href = redirectTo;
+            } catch (err) {
+                showError(err.message || 'Something went wrong.');
+                btn.disabled = false;
+                btn.textContent = isSignup ? 'Create account' : 'Log in';
+            }
+        });
+    </script>
+</body>
+</html>
