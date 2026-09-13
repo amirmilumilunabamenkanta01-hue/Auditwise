@@ -8,7 +8,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -16,55 +16,58 @@
     <div data-nav></div>
 
     <!-- HERO -->
-    <section class="hero">
-        <div class="container">
+    <section class="hero-dark">
+        <div class="container text-center">
             <span class="hero-eyebrow">Pricing</span>
-            <h1>Simple pricing. No subscriptions.</h1>
-            <p class="hero-sub">
+            <h1 style="max-width: 720px; margin-left: auto; margin-right: auto;">
+                Simple pricing. <span class="accent">No subscriptions.</span>
+            </h1>
+            <p class="hero-sub" style="margin-left: auto; margin-right: auto;">
                 Pay only for the scans you run. One flat price, full report, no monthly commitment.
             </p>
         </div>
     </section>
 
     <!-- PRICING CARD -->
-    <section class="section">
-        <div class="container">
-            <div style="max-width: 480px; margin: 0 auto;">
-                <div class="card card-lg" style="border-color: var(--primary); border-width: 2px;">
+    <section class="section" style="padding-top: 0;">
+        <div class="container" style="position: relative; margin-top: -60px;">
+            <div style="max-width: 520px; margin: 0 auto;">
+                <div class="card card-lg" style="border-color: var(--brand); border-width: 2px; box-shadow: 0 20px 60px rgba(16, 185, 129, 0.15);">
+
                     <div class="text-center">
-                        <span class="badge badge-low" style="margin-bottom: 16px;">Most popular</span>
-                        <h2 style="font-family: var(--font-heading); font-size: 1.5rem; margin-bottom: 8px;">
-                            Single security report
+                        <span class="badge badge-low" style="margin-bottom: 16px;">Single report</span>
+                        <h2 style="font-size: 1.4rem; margin-bottom: 8px; letter-spacing: -0.02em;">
+                            Security report
                         </h2>
-                        <div style="display: flex; align-items: baseline; justify-content: center; gap: 8px; margin: 24px 0;">
-                            <span style="font-size: 3.5rem; font-weight: 700; letter-spacing: -0.03em; color: var(--text-primary);">$29</span>
-                            <span style="font-size: 1rem; color: var(--text-muted);">/ scan</span>
-                        </div>
-                        <p class="text-secondary" style="margin-bottom: 32px;">
-                            Everything you need to turn raw scanner output into a client-ready report.
+                        <p class="text-secondary" style="font-size: 0.9rem; margin-bottom: 24px;">
+                            Full AI-assisted analysis of one scan
                         </p>
+                        <div style="display: flex; align-items: baseline; justify-content: center; gap: 8px; margin: 20px 0 32px;">
+                            <span style="font-size: 3.75rem; font-weight: 700; letter-spacing: -0.04em; color: var(--text-primary); line-height: 1;">$29</span>
+                            <span style="font-size: 1rem; color: var(--text-muted); font-weight: 500;">/ scan</span>
+                        </div>
                     </div>
 
                     <ul style="margin-bottom: 32px;">
                         <li style="padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 12px;">
-                            <span style="color: var(--low); flex-shrink: 0; font-weight: 700;">✓</span>
-                            <span>AI-powered analysis of Slither, Mythril, and Aderyn output</span>
+                            <span style="color: var(--brand); flex-shrink: 0; font-weight: 700; margin-top: 1px;">✓</span>
+                            <span style="font-size: 0.94rem;">AI analysis of Slither, Mythril & Aderyn output</span>
                         </li>
                         <li style="padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 12px;">
-                            <span style="color: var(--low); flex-shrink: 0; font-weight: 700;">✓</span>
-                            <span>Findings ranked by severity with explanations and fixes</span>
+                            <span style="color: var(--brand); flex-shrink: 0; font-weight: 700; margin-top: 1px;">✓</span>
+                            <span style="font-size: 0.94rem;">Findings ranked by severity with explanations & fixes</span>
                         </li>
                         <li style="padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 12px;">
-                            <span style="color: var(--low); flex-shrink: 0; font-weight: 700;">✓</span>
-                            <span>Security score (0–100) for quick triage</span>
+                            <span style="color: var(--brand); flex-shrink: 0; font-weight: 700; margin-top: 1px;">✓</span>
+                            <span style="font-size: 0.94rem;">Security score (0–100) for quick triage</span>
                         </li>
                         <li style="padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 12px;">
-                            <span style="color: var(--low); flex-shrink: 0; font-weight: 700;">✓</span>
-                            <span>Email delivery of the report + permanent access in your dashboard</span>
+                            <span style="color: var(--brand); flex-shrink: 0; font-weight: 700; margin-top: 1px;">✓</span>
+                            <span style="font-size: 0.94rem;">Emailed delivery + permanent dashboard access</span>
                         </li>
                         <li style="padding: 12px 0; display: flex; align-items: flex-start; gap: 12px;">
-                            <span style="color: var(--low); flex-shrink: 0; font-weight: 700;">✓</span>
-                            <span>Supports scan output up to 150,000 characters</span>
+                            <span style="color: var(--brand); flex-shrink: 0; font-weight: 700; margin-top: 1px;">✓</span>
+                            <span style="font-size: 0.94rem;">Scan output up to 150,000 characters</span>
                         </li>
                     </ul>
 
@@ -81,9 +84,12 @@
     </section>
 
     <!-- FAQ -->
-    <section class="section" style="border-top: 1px solid var(--border);">
+    <section class="section" style="padding-top: 40px;">
         <div class="container" style="max-width: 720px;">
-            <h2 class="text-center mb-4">Pricing questions</h2>
+            <div class="section-header">
+                <span class="eyebrow">Common questions</span>
+                <h2>Pricing FAQ</h2>
+            </div>
 
             <div class="card mb-3">
                 <h4 style="margin-bottom: 8px;">Do I have to pay before I see if it works?</h4>
@@ -112,9 +118,18 @@
         </div>
     </section>
 
+    <!-- FINAL CTA -->
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to triage your next contract?</h2>
+            <p>Run your first scan in under a minute. $29 per report, no subscription.</p>
+            <a href="index.html#submit" class="btn btn-primary btn-lg">Start a scan — $29</a>
+        </div>
+    </section>
+
     <div data-footer></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="js/nav.js"></script>
 </body>
-                          </html>
+</html>
