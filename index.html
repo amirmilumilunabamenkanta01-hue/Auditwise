@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,7 +9,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -16,18 +17,81 @@
     <!-- Shared Navigation -->
     <div data-nav></div>
 
-    <!-- HERO -->
-    <section class="hero">
+    <!-- HERO (dark) -->
+    <section class="hero-dark">
         <div class="container">
-            <span class="hero-eyebrow">AI-assisted security analysis</span>
-            <h1>Turn raw scan output into a report your team can actually read.</h1>
-            <p class="hero-sub">
-                Paste your Slither, Mythril, or Aderyn output. Get a prioritized, human-readable report
-                with severities, explanations, and suggested fixes — in under a minute.
-            </p>
-            <div class="hero-actions">
-                <a href="#submit" class="btn btn-primary btn-lg">Start a scan</a>
-                <a href="#how-it-works" class="btn btn-secondary btn-lg">How it works</a>
+            <div class="hero-grid">
+                <div>
+                    <span class="hero-eyebrow">AI-assisted security analysis</span>
+                    <h1>
+                        Turn raw scan output into a report your <span class="accent">team can actually read</span>.
+                    </h1>
+                    <p class="hero-sub">
+                        Paste your Slither, Mythril, or Aderyn output. Get a prioritized, human-readable report
+                        with severities, explanations, and suggested fixes — in under a minute.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="#submit" class="btn btn-primary btn-lg">Start a scan</a>
+                        <a href="#how-it-works" class="btn btn-ghost-light btn-lg">How it works</a>
+                    </div>
+                </div>
+
+                <!-- Report mockup -->
+                <div class="hero-visual">
+                    <div class="report-mockup">
+                        <div class="mockup-header">
+                            <span class="mockup-title">Security Report</span>
+                            <div class="mockup-score">
+                                <span>Score</span>
+                                <span class="mockup-score-value">62</span>
+                            </div>
+                        </div>
+
+                        <div class="mockup-finding">
+                            <div class="mockup-finding-title">
+                                <span>Reentrancy Vulnerability</span>
+                                <span class="severity-pill critical">Critical</span>
+                            </div>
+                            <div class="mockup-finding-desc">
+                                External call before state update in withdraw() allows recursive drain.
+                            </div>
+                        </div>
+
+                        <div class="mockup-finding high">
+                            <div class="mockup-finding-title">
+                                <span>Unchecked Return Value</span>
+                                <span class="severity-pill high">High</span>
+                            </div>
+                            <div class="mockup-finding-desc">
+                                transfer() return value ignored in deposit logic — may silently fail.
+                            </div>
+                        </div>
+
+                        <div class="mockup-finding high">
+                            <div class="mockup-finding-title">
+                                <span>Missing Access Control</span>
+                                <span class="severity-pill high">High</span>
+                            </div>
+                            <div class="mockup-finding-desc">
+                                setFee() callable by any address — should be restricted to owner.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TRUST BAR -->
+    <section class="trust-bar">
+        <div class="container">
+            <p class="trust-bar-label">Compatible with output from</p>
+            <div class="trust-logos">
+                <span>SLITHER</span>
+                <span>MYTHRIL</span>
+                <span>ADERYN</span>
+                <span>SEMGREP</span>
+                <span>SECURIFY</span>
             </div>
         </div>
     </section>
@@ -35,44 +99,48 @@
     <!-- HOW IT WORKS -->
     <section class="section" id="how-it-works">
         <div class="container">
-            <div class="text-center mb-4">
-                <h2>How it works</h2>
-                <p class="text-secondary mt-2">Three steps from raw output to a client-ready report.</p>
+            <div class="section-header">
+                <span class="eyebrow">How it works</span>
+                <h2>Three steps from raw output to a client-ready report</h2>
+                <p>No setup. No config files. No API keys to manage.</p>
             </div>
 
-            <div class="stats-grid">
-                <div class="card card-hover">
-                    <h3>1. Run your scanner</h3>
-                    <p class="mt-2">
-                        Use Slither, Mythril, Aderyn, or any static-analysis tool. Copy the raw output.
-                    </p>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <span class="feature-step">01</span>
+                    <div class="feature-icon">⛓</div>
+                    <h3>Run your scanner</h3>
+                    <p>Use Slither, Mythril, Aderyn, or any static-analysis tool. Copy the raw output.</p>
                 </div>
-                <div class="card card-hover">
-                    <h3>2. Paste & submit</h3>
-                    <p class="mt-2">
-                        Select the contract type, paste your output, and submit. We handle the rest.
-                    </p>
+
+                <div class="feature-card">
+                    <span class="feature-step">02</span>
+                    <div class="feature-icon">▤</div>
+                    <h3>Paste & submit</h3>
+                    <p>Select the contract type, paste your output, and submit. We handle the rest.</p>
                 </div>
-                <div class="card card-hover">
-                    <h3>3. Get your report</h3>
-                    <p class="mt-2">
-                        Receive a prioritized report with explanations, severity levels, and fix suggestions.
-                    </p>
+
+                <div class="feature-card">
+                    <span class="feature-step">03</span>
+                    <div class="feature-icon">✓</div>
+                    <h3>Get your report</h3>
+                    <p>Receive a prioritized report with explanations, severity levels, and fix suggestions.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- SUBMISSION FORM -->
-    <section class="section" id="submit">
+    <section class="section" id="submit" style="background-color: var(--bg-subtle); border-top: 1px solid var(--border);">
         <div class="container">
+            <div class="section-header">
+                <span class="eyebrow">Start a scan</span>
+                <h2>Submit your scan output</h2>
+                <p>You must be logged in to submit. Reports are generated in under a minute.</p>
+            </div>
+
             <div style="max-width: 720px; margin: 0 auto;">
                 <div class="card card-lg">
-                    <h2 class="mb-2">Submit a scan</h2>
-                    <p class="text-secondary mb-4">
-                        Paste your scan output below. You must be logged in to submit.
-                    </p>
-
                     <form id="scan-form">
                         <div class="form-group">
                             <label class="form-label" for="contractType">Contract type</label>
@@ -115,6 +183,64 @@
         </div>
     </section>
 
+    <!-- WHAT YOU GET -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <span class="eyebrow">What you get</span>
+                <h2>Every report includes</h2>
+                <p>Built to be read by humans, not just parsed by machines.</p>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">◈</div>
+                    <h3>Severity ranking</h3>
+                    <p>Findings categorized as critical, high, medium, or low — so you know what to fix first.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">✎</div>
+                    <h3>Plain-English explanations</h3>
+                    <p>Every finding includes what it is, why it matters, and how to fix it — no jargon.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">⌘</div>
+                    <h3>Code snippets + fixes</h3>
+                    <p>Relevant code excerpts alongside recommended remediation code.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">◐</div>
+                    <h3>Security score</h3>
+                    <p>A 0–100 score so you can quickly gauge the state of a codebase at a glance.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">✉</div>
+                    <h3>Emailed + stored</h3>
+                    <p>Delivered to your inbox and permanently available in your dashboard.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">⊞</div>
+                    <h3>Raw output included</h3>
+                    <p>Every report includes the original scan output so nothing is hidden.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FINAL CTA (dark) -->
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to triage your next contract?</h2>
+            <p>Run your first scan in under a minute. $29 per report, no subscription.</p>
+            <a href="#submit" class="btn btn-primary btn-lg">Start a scan — $29</a>
+        </div>
+    </section>
+
     <!-- Shared Footer -->
     <div data-footer></div>
 
@@ -127,7 +253,7 @@
 
         // Paddle Billing checkout setup.
         Paddle.Setup({ token: 'pdl_live_client_01m17a2s4rqjgacx1mzgh1cpkf_wPBgM52jYGExxSpVSSHq2Zh9W7' });
-        const PADDLE_PRICE_ID = 'PASTE_YOUR_PADDLE_PRICE_ID_HERE'; // not yet provided — get this from Paddle → Catalog → Prices
+        const PADDLE_PRICE_ID = 'PASTE_YOUR_PADDLE_PRICE_ID_HERE';
 
         const form = document.getElementById('scan-form');
         const btn = document.getElementById('submit-btn');
@@ -158,7 +284,6 @@
             if (!scanOutput || scanOutput.length < 10) return showError('Please paste your scan output.');
             if (scanOutput.length > 150000) return showError('Scan output exceeds the 150,000 character limit.');
 
-            // Require login before submission
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) {
                 window.location.href = 'login.html?redirect=index.html%23submit';
@@ -179,13 +304,11 @@
 
                 if (!res.ok) throw new Error(data.error || 'Submission failed.');
 
-                // Admin bypass: report is ready immediately
                 if (data.admin_bypass) {
                     window.location.href = `report.html?id=${data.reportId}`;
                     return;
                 }
 
-                // Normal user: open Paddle checkout with pendingId
                 if (data.pendingId) {
                     Paddle.Checkout.open({
                         items: [{ priceId: PADDLE_PRICE_ID, quantity: 1 }],
