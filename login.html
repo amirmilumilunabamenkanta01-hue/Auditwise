@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+          <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -8,12 +8,11 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-    <!-- Simple header with just the logo (no nav links) -->
     <nav class="nav">
         <div class="container nav-inner">
             <a href="index.html" class="nav-logo">
@@ -83,11 +82,9 @@
         const togglePrompt = document.getElementById('toggle-prompt');
         const toggleLink = document.getElementById('toggle-link');
 
-        // If a redirect target was passed in the URL, keep it
         const params = new URLSearchParams(window.location.search);
         const redirectTo = params.get('redirect') || 'dashboard.html';
 
-        // If already logged in, go straight to dashboard
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
             window.location.href = redirectTo;
@@ -145,7 +142,6 @@
                     const { data, error } = await supabase.auth.signUp({ email, password });
                     if (error) throw error;
 
-                    // If email confirmation is enabled in Supabase, no session yet
                     if (data.user && !data.session) {
                         showSuccess('Account created. Check your inbox to confirm your email.');
                         btn.disabled = false;
@@ -157,7 +153,6 @@
                     if (error) throw error;
                 }
 
-                // Success — redirect
                 window.location.href = redirectTo;
             } catch (err) {
                 showError(err.message || 'Something went wrong.');
@@ -167,4 +162,4 @@
         });
     </script>
 </body>
-</html>
+</html>                      
