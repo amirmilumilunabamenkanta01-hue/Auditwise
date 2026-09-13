@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuditWise — AI-Powered Smart Contract Security Reports</title>
+    <meta name="description" content="Turn raw Slither, Mythril, or Aderyn output into a prioritized, human-readable security report in seconds.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Shared Navigation -->
+    <div data-nav></div>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="container">
+            <span class="hero-eyebrow">AI-assisted security analysis</span>
+            <h1>Turn raw scan output into a report your team can actually read.</h1>
+            <p class="hero-sub">
+                Paste your Slither, Mythril, or Aderyn output. Get a prioritized, human-readable report
+                with severities, explanations, and suggested fixes — in under a minute.
+            </p>
+            <div class="hero-actions">
+                <a href="#submit" class="btn btn-primary btn-lg">Start a scan</a>
+                <a href="#how-it-works" class="btn btn-secondary btn-lg">How it works</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="section" id="how-it-works">
+        <div class="container">
+            <div class="text-center mb-4">
+                <h2>How it works</h2>
+                <p class="text-secondary mt-2">Three steps from raw output to a client-ready report.</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="card card-hover">
+                    <h3>1. Run your scanner</h3>
+                    <p class="mt-2">
+                        Use Slither, Mythril, Aderyn, or any static-analysis tool. Copy the raw output.
+                    </p>
+                </div>
+                <div class="card card-hover">
+                    <h3>2. Paste & submit</h3>
+                    <p class="mt-2">
+                        Select the contract type, paste your output, and submit. We handle the rest.
+                    </p>
+                </div>
+                <div class="card card-hover">
+                    <h3>3. Get your report</h3>
+                    <p class="mt-2">
+                        Receive a prioritized report with explanations, severity levels, and fix suggestions.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SUBMISSION FORM -->
+    <section class="section" id="submit">
+        <div class="container">
+            <div style="max-width: 720px; margin: 0 auto;">
+                <div class="card card-lg">
+                    <h2 class="mb-2">Submit a scan</h2>
+                    <p class="text-secondary mb-4">
+                        Paste your scan output below. You must be logged in to submit.
+                    </p>
+
+                    <form id="scan-form">
+                        <div class="form-group">
+                            <label class="form-label" for="contractType">Contract type</label>
+                            <select class="form-select" id="contractType" required>
+                                <option value="">Select a contract type…</option>
+                                <option value="ERC20">ERC20</option>
+                                <option value="ERC721">ERC721</option>
+                                <option value="ERC1155">ERC1155</option>
+                                <option value="DeFi / DEX">DeFi / DEX</option>
+                                <option value="Lending / Borrowing">Lending / Borrowing</option>
+                                <option value="NFT Marketplace">NFT Marketplace</option>
+                                <option value="DAO / Governance">DAO / Governance</option>
+                                <option value="Bridge">Bridge</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="scanOutput">Scan output</label>
+                            <textarea
+                                class="form-textarea"
+                                id="scanOutput"
+                                placeholder="Paste your Slither, Mythril, or Aderyn output here…"
+                                required
+                            ></textarea>
+                            <p class="form-hint">
+                                Maximum 150,000 characters. Larger outputs can be trimmed to the findings section.
+                            </p>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg btn-block" id="submit-btn">
+                            Generate report — $29
+                        </button>
+
+                        <p id="form-error" class="form-error hidden"></p>
+                        <p id="form-success" class="form-success hidden"></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Shared Footer -->
+    <div data-footer></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+    <script type="module" src="js/nav.js"></script>
+    <script type="module">
+        import { API_URL, supabase, getAuthHeaders } from './js/config.js';
+
+        // Paddle Billing checkout setup.
+        Paddle.Setup({ token: 'pdl_live_client_01m17a2s4rqjgacx1mzgh1cpkf_wPBgM52jYGExxSpVSSHq2Zh9W7' });
+        const PADDLE_PRICE_ID = 'PASTE_YOUR_PADDLE_PRICE_ID_HERE'; // not yet provided — get this from Paddle → Catalog → Prices
+
+        const form = document.getElementById('scan-form');
+        const btn = document.getElementById('submit-btn');
+        const errorEl = document.getElementById('form-error');
+        const successEl = document.getElementById('form-success');
+
+        function showError(msg) {
+            errorEl.textContent = msg;
+            errorEl.classList.remove('hidden');
+            successEl.classList.add('hidden');
+        }
+
+        function showSuccess(msg) {
+            successEl.textContent = msg;
+            successEl.classList.remove('hidden');
+            errorEl.classList.add('hidden');
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            errorEl.classList.add('hidden');
+            successEl.classList.add('hidden');
+
+            const contractType = document.getElementById('contractType').value;
+            const scanOutput = document.getElementById('scanOutput').value;
+
+            if (!contractType) return showError('Please select a contract type.');
+            if (!scanOutput || scanOutput.length < 10) return showError('Please paste your scan output.');
+            if (scanOutput.length > 150000) return showError('Scan output exceeds the 150,000 character limit.');
+
+            // Require login before submission
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                window.location.href = 'login.html?redirect=index.html%23submit';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Processing…';
+
+            try {
+                const res = await fetch(`${API_URL}/create-payment`, {
+                    method: 'POST',
+                    headers: await getAuthHeaders(),
+                    body: JSON.stringify({ contractType, scanOutput })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) throw new Error(data.error || 'Submission failed.');
+
+                // Admin bypass: report is ready immediately
+                if (data.admin_bypass) {
+                    window.location.href = `report.html?id=${data.reportId}`;
+                    return;
+                }
+
+                // Normal user: open Paddle checkout with pendingId
+                if (data.pendingId) {
+                    Paddle.Checkout.open({
+                        items: [{ priceId: PADDLE_PRICE_ID, quantity: 1 }],
+                        customer: { email: data.email },
+                        customData: { pending_id: data.pendingId }
+                    });
+                    btn.disabled = false;
+                    btn.textContent = 'Generate report — $29';
+                }
+            } catch (err) {
+                showError(err.message);
+                btn.disabled = false;
+                btn.textContent = 'Generate report — $29';
+            }
+        });
+    </script>
+</body>
+</html>
