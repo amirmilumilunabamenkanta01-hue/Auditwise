@@ -9,7 +9,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -17,6 +17,12 @@
     <!-- Login state -->
     <div id="login-view" class="auth-wrapper">
         <div class="auth-card">
+            <div class="text-center mb-3">
+                <div class="nav-logo" style="justify-content: center; display: inline-flex;">
+                    <span class="nav-logo-mark">AW</span>
+                    <span>AuditWise</span>
+                </div>
+            </div>
             <h1>Admin access</h1>
             <p class="auth-sub">Enter your admin password to continue.</p>
 
@@ -67,7 +73,7 @@
                     </div>
                     <div class="stat-card">
                         <div class="stat-label">Revenue</div>
-                        <div class="stat-value" style="color: var(--low);" id="admin-revenue">—</div>
+                        <div class="stat-value" style="color: var(--brand);" id="admin-revenue">—</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-label">Avg score</div>
@@ -303,4 +309,4 @@
         }
     </script>
 </body>
-  </html>
+</html>
