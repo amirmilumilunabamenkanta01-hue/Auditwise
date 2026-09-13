@@ -36,7 +36,7 @@ const FOOTER_HTML = `
                     <span class="nav-logo-mark">AW</span>
                     <span>AuditWise</span>
                 </a>
-                <p>AI-powered smart contract security reports for developers and auditors.</p>
+                <p>AI-powered smart contract security reports for developers, auditors, and security teams.</p>
             </div>
             <div class="footer-col">
                 <h4>Product</h4>
@@ -80,19 +80,23 @@ async function renderNav() {
     if (navMount) navMount.innerHTML = NAV_HTML;
 
     // Update nav actions based on auth state
-    const { data: { session } } = await supabase.auth.getSession();
-    const actionsEl = document.getElementById('nav-actions');
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const actionsEl = document.getElementById('nav-actions');
 
-    if (session && actionsEl) {
-        actionsEl.innerHTML = `
-            <a href="dashboard.html" class="btn btn-ghost">Dashboard</a>
-            <a href="#" class="btn btn-secondary" id="nav-logout">Log out</a>
-        `;
-        document.getElementById('nav-logout').addEventListener('click', async (e) => {
-            e.preventDefault();
-            await supabase.auth.signOut();
-            window.location.href = 'index.html';
-        });
+        if (session && actionsEl) {
+            actionsEl.innerHTML = `
+                <a href="dashboard.html" class="btn btn-ghost">Dashboard</a>
+                <a href="#" class="btn btn-secondary" id="nav-logout">Log out</a>
+            `;
+            document.getElementById('nav-logout').addEventListener('click', async (e) => {
+                e.preventDefault();
+                await supabase.auth.signOut();
+                window.location.href = 'index.html';
+            });
+        }
+    } catch (err) {
+        console.error('Nav auth check failed:', err);
     }
 }
 
@@ -101,5 +105,20 @@ function renderFooter() {
     if (footerMount) footerMount.innerHTML = FOOTER_HTML;
 }
 
+// Reveal-on-scroll observer
+function setupReveal() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+}
+
 renderNav();
 renderFooter();
+setupReveal();
