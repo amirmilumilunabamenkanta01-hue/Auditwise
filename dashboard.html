@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — AuditWise</title>
+    <meta name="description" content="Your AuditWise dashboard.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div data-nav></div>
+
+    <main class="section">
+        <div class="container">
+
+            <div class="flex-between mb-4" style="flex-wrap: wrap; gap: 16px;">
+                <div>
+                    <h1>Dashboard</h1>
+                    <p class="text-secondary mt-1">Overview of your scans and reports.</p>
+                </div>
+                <a href="index.html#submit" class="btn btn-primary">New scan</a>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid mb-4">
+                <div class="stat-card">
+                    <div class="stat-label">Total scans</div>
+                    <div class="stat-value" id="stat-total">—</div>
+                    <div class="stat-delta" id="stat-total-delta"></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Average score</div>
+                    <div class="stat-value" id="stat-score">—</div>
+                    <div class="stat-delta" id="stat-score-delta"></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Critical issues</div>
+                    <div class="stat-value" id="stat-critical" style="color: var(--critical);">—</div>
+                    <div class="stat-delta" id="stat-critical-delta"></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">High issues</div>
+                    <div class="stat-value" id="stat-high" style="color: var(--high);">—</div>
+                    <div class="stat-delta" id="stat-high-delta"></div>
+                </div>
+            </div>
+
+            <!-- Scan history -->
+            <div class="mb-4">
+                <h2 class="mb-3">Recent scans</h2>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Contract type</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="reports-table">
+                            <tr>
+                                <td colspan="4" class="text-center text-muted" style="padding: 32px;">
+                                    Loading…
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Profile -->
+            <div class="card card-lg mb-4">
+                <h2 class="mb-2">Profile</h2>
+                <p class="text-secondary mb-4">Update your display name and company.</p>
+
+                <form id="profile-form" style="max-width: 480px;">
+                    <div class="form-group">
+                        <label class="form-label" for="display_name">Display name</label>
+                        <input type="text" class="form-input" id="display_name" placeholder="Your name">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="company_name">Company</label>
+                        <input type="text" class="form-input" id="company_name" placeholder="Company name">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="profile-btn">Save changes</button>
+                    <p id="profile-msg" class="form-success hidden mt-2"></p>
+                    <p id="profile-error" class="form-error hidden"></p>
+                </form>
+            </div>
+
+            <!-- Danger zone -->
+            <div class="card card-lg" style="border-color: #fecaca;">
+                <h2 class="mb-2" style="color: var(--critical);">Danger zone</h2>
+                <p class="text-secondary mb-3">
+                    Deleting your account permanently removes all your scans, reports, and profile data.
+                    This action cannot be undone.
+                </p>
+                <button class="btn btn-danger" id="delete-account-btn">Delete my account</button>
+            </div>
+
+        </div>
+    </main>
+
+    <div data-footer></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="js/nav.js"></script>
+    <script type="module">
+        import { API_URL, supabase, getAuthHeaders } from './js/config.js';
+
+        // ---- Auth guard ----
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+            window.location.href = 'login.html?redirect=dashboard.html';
+            throw new Error('Not authenticated');
+        }
+
+        // ---- Helpers ----
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function setDelta(elId, value, { inverse = false } = {}) {
+            const el = document.getElementById(elId);
+            if (value === null || value === undefined || isNaN(value)) {
+                el.textContent = '';
+                el.className = 'stat-delta';
+                return;
+            }
+            const positive = inverse ? value < 0 : value > 0;
+            el.textContent = (value > 0 ? '+' : '') + value;
+            el.className = 'stat-delta ' + (positive ? 'up' : 'down');
+        }
+
+        function formatDate(iso) {
+            const d = new Date(iso);
+            return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        // ---- Load dashboard stats ----
+        async function loadStats() {
+            try {
+                const res = await fetch(`${API_URL}/dashboard-stats`, {
+                    headers: await getAuthHeaders()
+                });
+                if (!res.ok) throw new Error('Failed to load stats');
+                const s = await res.json();
+
+                document.getElementById('stat-total').textContent = s.totalScans ?? 0;
+                document.getElementById('stat-score').textContent = s.avgScore ?? '—';
+                document.getElementById('stat-critical').textContent = s.critical ?? 0;
+                document.getElementById('stat-high').textContent = s.high ?? 0;
+
+                const d = s.deltas || {};
+                setDelta('stat-total-delta', d.totalScansThisMonth);
+                setDelta('stat-score-delta', d.avgScoreChange);
+                setDelta('stat-critical-delta', d.criticalChange, { inverse: true });
+                setDelta('stat-high-delta', d.highChange, { inverse: true });
+            } catch (err) {
+                console.error('Stats error:', err);
+            }
+        }
+
+        // ---- Load scan history ----
+        async function loadReports() {
+            const tbody = document.getElementById('reports-table');
+            try {
+                const res = await fetch(`${API_URL}/user-reports`, {
+                    method: 'POST',
+                    headers: await getAuthHeaders()
+                });
+                if (!res.ok) throw new Error('Failed to load reports');
+                const data = await res.json();
+
+                if (!data.reports || data.reports.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="text-center text-muted" style="padding: 32px;">
+                                No scans yet. <a href="index.html#submit">Submit your first scan</a>.
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                tbody.innerHTML = data.reports.map(r => `
+                    <tr>
+                        <td>${formatDate(r.created_at)}</td>
+                        <td>${escapeHtml(r.contract_type)}</td>
+                        <td>
+                            <span class="badge ${r.paid ? 'badge-low' : 'badge-neutral'}">
+                                ${r.paid ? 'Paid' : 'Pending'}
+                            </span>
+                        </td>
+                        <td style="text-align: right;">
+                            <a href="report.html?id=${encodeURIComponent(r.id)}" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;">
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="text-center" style="padding: 32px; color: var(--critical);">
+                            Failed to load scans.
+                        </td>
+                    </tr>
+                `;
+                console.error('Reports error:', err);
+            }
+        }
+
+        // ---- Profile load + save ----
+        async function loadProfile() {
+            try {
+                const res = await fetch(`${API_URL}/profile`, { headers: await getAuthHeaders() });
+                if (!res.ok) throw new Error('Failed to load profile');
+                const p = await res.json();
+                document.getElementById('display_name').value = p.display_name || '';
+                document.getElementById('company_name').value = p.company_name || '';
+            } catch (err) {
+                console.error('Profile load error:', err);
+            }
+        }
+
+        document.getElementById('profile-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('profile-btn');
+            const msg = document.getElementById('profile-msg');
+            const err = document.getElementById('profile-error');
+            msg.classList.add('hidden');
+            err.classList.add('hidden');
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Saving…';
+
+            try {
+                const res = await fetch(`${API_URL}/profile`, {
+                    method: 'POST',
+                    headers: await getAuthHeaders(),
+                    body: JSON.stringify({
+                        display_name: document.getElementById('display_name').value,
+                        company_name: document.getElementById('company_name').value
+                    })
+                });
+                if (!res.ok) throw new Error('Failed to save');
+                msg.textContent = 'Profile saved.';
+                msg.classList.remove('hidden');
+            } catch (e2) {
+                err.textContent = e2.message;
+                err.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Save changes';
+            }
+        });
+
+        // ---- Delete account ----
+        document.getElementById('delete-account-btn').addEventListener('click', async () => {
+            const password = prompt('Enter your password to confirm deletion:');
+            if (!password) return;
+
+            try {
+                const res = await fetch(`${API_URL}/delete-account`, {
+                    method: 'POST',
+                    headers: await getAuthHeaders(),
+                    body: JSON.stringify({ password })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Failed to delete account');
+
+                alert('Your account has been deleted.');
+                await supabase.auth.signOut();
+                window.location.href = 'index.html';
+            } catch (err) {
+                alert(err.message);
+            }
+        });
+
+        // ---- Load everything ----
+        loadStats();
+        loadReports();
+        loadProfile();
+    </script>
+</body>
+</html>
