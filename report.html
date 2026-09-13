@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+     <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -34,51 +34,61 @@
             <!-- Report content -->
             <div id="report-container" class="hidden">
 
-                <div class="mb-4">
-                    <a href="dashboard.html" style="font-size: 0.875rem;">← Back to dashboard</a>
-                    <h1 class="mt-2">Security report</h1>
-                    <p class="text-secondary mt-1" id="report-meta">—</p>
+                <div class="flex-between mb-4" style="flex-wrap: wrap; gap: 16px;">
+                    <div>
+                        <a href="dashboard.html" style="font-size: 0.875rem;">← Back to dashboard</a>
+                        <h1 class="mt-2">Security report</h1>
+                        <p class="text-secondary mt-1" id="report-meta">—</p>
+                    </div>
+                    <button class="btn btn-primary" id="download-pdf">
+                        Download as PDF
+                    </button>
                 </div>
 
-                <!-- Summary card -->
-                <div class="card card-lg mb-4">
-                    <div class="flex-between mb-3" style="flex-wrap: wrap; gap: 16px;">
-                        <div>
-                            <div class="stat-label">Security score</div>
-                            <div class="stat-value" id="report-score" style="font-size: 2.75rem; color: var(--brand);">—</div>
+                <!-- Printable content wrapper -->
+                <div id="pdf-content">
+
+                    <!-- Summary card -->
+                    <div class="card card-lg mb-4">
+                        <div class="flex-between mb-3" style="flex-wrap: wrap; gap: 16px;">
+                            <div>
+                                <div class="stat-label">Security score</div>
+                                <div class="stat-value" id="report-score" style="font-size: 2.75rem; color: var(--brand);">—</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="stat-label">Critical</div>
+                                <div class="stat-value" style="color: var(--critical);" id="count-critical">0</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="stat-label">High</div>
+                                <div class="stat-value" style="color: var(--high);" id="count-high">0</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="stat-label">Medium</div>
+                                <div class="stat-value" style="color: var(--medium);" id="count-medium">0</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="stat-label">Low</div>
+                                <div class="stat-value" style="color: var(--low);" id="count-low">0</div>
+                            </div>
                         </div>
-                        <div class="text-center">
-                            <div class="stat-label">Critical</div>
-                            <div class="stat-value" style="color: var(--critical);" id="count-critical">0</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="stat-label">High</div>
-                            <div class="stat-value" style="color: var(--high);" id="count-high">0</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="stat-label">Medium</div>
-                            <div class="stat-value" style="color: var(--medium);" id="count-medium">0</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="stat-label">Low</div>
-                            <div class="stat-value" style="color: var(--low);" id="count-low">0</div>
+                        <div style="border-top: 1px solid var(--border); padding-top: 20px;">
+                            <div class="finding-section-label">Summary</div>
+                            <p id="report-summary">—</p>
                         </div>
                     </div>
-                    <div style="border-top: 1px solid var(--border); padding-top: 20px;">
-                        <div class="finding-section-label">Summary</div>
-                        <p id="report-summary">—</p>
-                    </div>
+
+                    <!-- Top priority findings -->
+                    <h2 class="mb-3">Top priority findings</h2>
+                    <div id="top-findings" class="mb-4"></div>
+
+                    <!-- All findings -->
+                    <h2 class="mb-3">All findings</h2>
+                    <div id="all-findings"></div>
+
                 </div>
 
-                <!-- Top priority findings -->
-                <h2 class="mb-3">Top priority findings</h2>
-                <div id="top-findings" class="mb-4"></div>
-
-                <!-- All findings -->
-                <h2 class="mb-3">All findings</h2>
-                <div id="all-findings"></div>
-
-                <!-- Raw output (collapsed) -->
+                <!-- Raw output (collapsed, not included in PDF) -->
                 <div class="card mt-4">
                     <details>
                         <summary style="cursor: pointer; font-weight: 500; color: var(--text-primary);">
@@ -95,6 +105,7 @@
     <div data-footer></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script type="module" src="js/nav.js"></script>
     <script type="module">
         import { API_URL, supabase, getAuthHeaders } from './js/config.js';
@@ -113,7 +124,6 @@
             errorEl.classList.remove('hidden');
         }
 
-        // Escape user-supplied strings before injecting into HTML
         function escapeHtml(str) {
             if (str === null || str === undefined) return '';
             return String(str)
@@ -234,7 +244,35 @@
             }
         }
 
+        // ---- PDF Download ----
+        document.getElementById('download-pdf').addEventListener('click', () => {
+            const btn = document.getElementById('download-pdf');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Generating PDF…';
+
+            const element = document.getElementById('pdf-content');
+            const opt = {
+                margin: [0.5, 0.5, 0.5, 0.5],
+                filename: `auditwise-report-${reportId || 'report'}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }).catch((err) => {
+                console.error('PDF error:', err);
+                btn.disabled = false;
+                btn.textContent = originalText;
+                alert('Failed to generate PDF. Please try again.');
+            });
+        });
+
         loadReport();
     </script>
 </body>
-</html>
+</html>                                   
